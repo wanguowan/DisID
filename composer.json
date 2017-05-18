@@ -1,0 +1,13 @@
+{
+    "name": "wan/dis-id",
+    "description": "distributed id create",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "王安宁",
+            "email": "wanguowan521@163.com"
+        }
+    ],
+    "require": {}
+}
