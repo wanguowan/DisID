@@ -49,6 +49,9 @@ class CDisID {
 	//	预留数据数据长度
 	private $m_nLeftBitLen;
 
+	//	baseTime修改标示
+	private $m_bBaseTimeChange;
+
 	/**
 	 * @return mixed
 	 */
@@ -63,13 +66,17 @@ class CDisID {
 	}
 
 	/**
-	 * @param mixed $m_nMSBaseTime
+	 * @param string $m_sMSBaseTime  format: YYYY-mm-dd
 	 */
-	public function setMNMSBaseTime( $m_nMSBaseTime )
+	public function setMNMSBaseTime( $m_sMSBaseTime )
 	{
-		if ( is_numeric( $m_nMSBaseTime ) && intval( $m_nMSBaseTime ) == $m_nMSBaseTime )
+		if ( is_string( $m_sMSBaseTime )
+			&& strlen( $m_sMSBaseTime ) > 0
+			&& 0 === strcasecmp( date( 'Y-m-d', strtotime( $m_sMSBaseTime ) ), $m_sMSBaseTime )
+		)
 		{
-			$this->m_nMSBaseTime = intval( $m_nMSBaseTime );
+			$this->m_bBaseTimeChange = true;
+			$this->m_nMSBaseTime = intval( strtotime( $m_sMSBaseTime ) * 1000 );
 			return $this;
 		}
 		else
@@ -85,7 +92,14 @@ class CDisID {
 	{
 		if ( is_int( $this->m_nMSTime ) )
 		{
-			return $this->m_nMSTime;
+			if ( ! $this->m_bBaseTimeChange )
+			{
+				return $this->m_nMSTime;
+			}
+			else
+			{
+				throw new \Exception( 'baseTime has change, please change baseTime first and set msTime second;' );
+			}
 		}
 		else
 		{
@@ -96,11 +110,28 @@ class CDisID {
 	/**
 	 * @param mixed $m_nMSTime
 	 */
-	public function setMNMSTime( $m_nMSTime )
+	public function setMNMSTime( $m_nMSTime = null )
 	{
 		if ( is_numeric( $m_nMSTime ) && intval( $m_nMSTime ) == $m_nMSTime )
 		{
-			$this->m_nMSTime = intval( $m_nMSTime );
+			if ( $this->_checkValueOutOfLimit( $m_nMSTime, $this->getMNMSTimeBitLen() ) )
+			{
+				$this->m_nMSTime = intval( $m_nMSTime );
+				$this->m_bBaseTimeChange = false;
+
+				return $this;
+			}
+			else
+			{
+				throw new \Exception( 'MSTime value out of limit' );
+			}
+		}
+		else if ( is_null( $m_nMSTime ) )	//	若未设置，使用当前时间
+		{
+			$nTimestampNow = time();
+			$this->m_nMSTime = intval( $nTimestampNow * 1000 - $this->getMNMSBaseTime() );
+			$this->m_bBaseTimeChange = false;
+
 			return $this;
 		}
 		else
@@ -162,8 +193,15 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nOpID ) && intval( $m_nOpID ) == $m_nOpID )
 		{
-			$this->m_nOpID = intval( $m_nOpID );
-			return $this;
+			if ( $this->_checkValueOutOfLimit( $m_nOpID, $this->getMNOpIDBitLen() ) )
+			{
+				$this->m_nOpID = intval( $m_nOpID );
+				return $this;
+			}
+			else
+			{
+				throw new \Exception( 'OpID value out of limit' );
+			}
 		}
 		else
 		{
@@ -224,8 +262,15 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nMrID ) && intval( $m_nMrID ) == $m_nMrID )
 		{
-			$this->m_nMrID = intval( $m_nMrID );
-			return $this;
+			if ( $this->_checkValueOutOfLimit( $m_nMrID, $this->getMNMrIDBitLen() ) )
+			{
+				$this->m_nMrID = intval( $m_nMrID );
+				return $this;
+			}
+			else
+			{
+				throw new \Exception( 'MrID value out of limit' );
+			}
 		}
 		else
 		{
@@ -286,8 +331,15 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nServerID ) && intval( $m_nServerID ) == $m_nServerID )
 		{
-			$this->m_nServerID = intval( $m_nServerID );
-			return $this;
+			if ( $this->_checkValueOutOfLimit( $m_nServerID, $this->getMNServerIDBitLen() ) )
+			{
+				$this->m_nServerID = intval( $m_nServerID );
+				return $this;
+			}
+			else
+			{
+				throw new \Exception( 'ServerID value out of limit' );
+			}
 		}
 		else
 		{
@@ -348,8 +400,15 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nInMSSN ) && intval( $m_nInMSSN ) == $m_nInMSSN )
 		{
-			$this->m_nInMSSN = intval( $m_nInMSSN );
-			return $this;
+			if ( $this->_checkValueOutOfLimit( $m_nInMSSN, $this->getMNInMSSNBitLen() ) )
+			{
+				$this->m_nInMSSN = intval( $m_nInMSSN );
+				return $this;
+			}
+			else
+			{
+				throw new \Exception( 'InMSSN value out of limit' );
+			}
 		}
 		else
 		{
@@ -410,8 +469,15 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nLeft ) && intval( $m_nLeft ) == $m_nLeft )
 		{
-			$this->m_nLeft = intval( $m_nLeft );
-			return $this;
+			if ( $this->_checkValueOutOfLimit( $m_nLeft, $this->getMNLeftBitLen() ) )
+			{
+				$this->m_nLeft = intval( $m_nLeft );
+				return $this;
+			}
+			else
+			{
+				throw new \Exception( 'left value out of limit' );
+			}
 		}
 		else
 		{
@@ -450,5 +516,26 @@ class CDisID {
 		}
 	}
 
+	private function _checkValueOutOfLimit( $nValue, $nLen )
+	{
+		if ( ! is_int( $nValue ) )
+		{
+			throw new \Exception( 'illegal check value' );
+		}
 
+		if ( ! is_int( $nLen ) )
+		{
+			throw new \Exception( 'illegal check length' );
+		}
+
+		$bRtn = false;
+
+		$nMax = pow( 2, $nLen );
+		if ( $nValue <= $nMax )
+		{
+			$bRtn = true;
+		}
+
+		return $bRtn;
+	}
 };
