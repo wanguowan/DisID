@@ -5,7 +5,7 @@
  * Date: 5/18/17
  * Time: 4:58 PM
  */
-namespace Wan\DisID;
+namespace wan\DisID;
 
 
 class CDisID {
@@ -112,31 +112,26 @@ class CDisID {
 	 */
 	public function setMNMSTime( $m_nMSTime = null )
 	{
-		if ( is_numeric( $m_nMSTime ) && intval( $m_nMSTime ) == $m_nMSTime )
+		if ( is_null( $m_nMSTime ) )	//	若未设置，使用当前时间
 		{
-			if ( $this->_checkValueOutOfLimit( $m_nMSTime, $this->getMNMSTimeBitLen() ) )
-			{
-				$this->m_nMSTime = intval( $m_nMSTime );
-				$this->m_bBaseTimeChange = false;
-
-				return $this;
-			}
-			else
-			{
-				throw new \Exception( 'MSTime value out of limit' );
-			}
+			$fTimestampNow = microtime( true );
+			$m_nMSTime = intval( $fTimestampNow * 1000 - $this->getMNMSBaseTime() );
 		}
-		else if ( is_null( $m_nMSTime ) )	//	若未设置，使用当前时间
+		else if ( ! is_numeric( $m_nMSTime ) || intval( $m_nMSTime ) != $m_nMSTime )
 		{
-			$nTimestampNow = time();
-			$this->m_nMSTime = intval( $nTimestampNow * 1000 - $this->getMNMSBaseTime() );
+			throw new \Exception( 'MSTime params error' );
+		}
+
+		if ( $this->_checkValueOutOfLimit( $m_nMSTime, $this->getMNMSTimeBitLen() ) )
+		{
+			$this->m_nMSTime = intval( $m_nMSTime );
 			$this->m_bBaseTimeChange = false;
 
 			return $this;
 		}
 		else
 		{
-			throw new \Exception( 'MSTime params error' );
+			throw new \Exception( 'MSTime value out of limit' );
 		}
 	}
 
@@ -393,6 +388,33 @@ class CDisID {
 		}
 	}
 
+	public function getMNRandInMSSN()
+	{
+		if ( is_int( $this->m_nInMSSN ) )
+		{
+			return $this->m_nInMSSN;
+		}
+		else
+		{
+			$nMSSNLen = $this->getMNInMSSNBitLen();
+			if ( $nMSSNLen <= 10 )
+			{
+				$arrTime = explode( ' ', microtime( false ) );
+				if ( is_array( $arrTime ) && count( $arrTime ) == 2 )
+				{
+					$sMs = $arrTime[ 0 ];
+					$nMic = $sMs * 1000000;
+					$nMicTmp = $nMic % 1000;
+					$this->m_nInMSSN = $nMicTmp % pow( 2, $nMSSNLen );
+				}
+			}
+			else
+			{
+				throw new \Exception( 'can not create so big random InMSSN' );
+			}
+		}
+	}
+
 	/**
 	 * @param mixed $m_nInMSSN
 	 */
@@ -531,7 +553,7 @@ class CDisID {
 		$bRtn = false;
 
 		$nMax = pow( 2, $nLen );
-		if ( $nValue <= $nMax )
+		if ( $nValue < $nMax )
 		{
 			$bRtn = true;
 		}

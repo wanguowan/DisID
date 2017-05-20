@@ -6,7 +6,7 @@
  * Time: 6:07 PM
  */
 
-namespace Wan\DisID;
+namespace wan\DisID;
 
 class CDisIDOp {
 

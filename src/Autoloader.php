@@ -5,6 +5,7 @@
  * Date: 5/20/17
  * Time: 2:14 PM
  */
+namespace wan;
 
 Class Autoloader
 {
@@ -39,11 +40,11 @@ Class Autoloader
 	 */
 	public function autoload( $className )
 	{
-		if (0 === strpos( $className, $this->prefix ) ) {
-			$parts = explode('\\', substr( $className, $this->prefixLength ) );
-			$filepath = $this->directory.DIRECTORY_SEPARATOR.implode( DIRECTORY_SEPARATOR, $parts ) . '.php';
-			if ( is_file( $filepath ) ) {
-				require $filepath;
+		if ( 0 === strpos( $className, $this->prefix ) ) {
+			$arrParts = explode( '\\', substr( $className, $this->prefixLength ) );
+			$sFilePath = $this->directory.DIRECTORY_SEPARATOR.implode( DIRECTORY_SEPARATOR, $arrParts ) . '.php';
+			if ( is_file( $sFilePath ) ) {
+				require $sFilePath;
 			}
 		}
 	}
