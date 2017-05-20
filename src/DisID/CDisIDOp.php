@@ -87,22 +87,22 @@ class CDisIDOp {
 			//	计算业务线编号
 			$nBitMoveLen += $nOpIDBitLen;
 			$nOpIDInt = $nOpID << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
-			$nDidID &= $nOpIDInt;
+			$nDidID |= $nOpIDInt;
 
 			//	计算机房编号
 			$nBitMoveLen += $nMrIDBitLen;
 			$nMrIDInt = $nMrID << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
-			$nDidID &= $nMrIDInt;
+			$nDidID |= $nMrIDInt;
 
 			//	计算预留值
 			$nBitMoveLen += $nLeftBitLen;
 			$nLeftInt = $nLeft << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
-			$nDidID &= $nLeftInt;
+			$nDidID |= $nLeftInt;
 
 			//	计算毫秒内序列号
 			$nBitMoveLen += $nInMSSNBitLen;
 			$nInMSSNInt = $nInMSSN << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
-			$nDidID &= $nInMSSNInt;
+			$nDidID |= $nInMSSNInt;
 
 			return $nDidID;
 		}
@@ -118,7 +118,7 @@ class CDisIDOp {
 
 		if ( $oCDisID instanceof CDisID )
 		{
-			$nMSTimeBitLen 		= $oCDisID->getMNMSTime();
+			$nMSTimeBitLen 		= $oCDisID->getMNMSTimeBitLen();
 			$nOpIDBitLen		= $oCDisID->getMNOpIDBitLen();
 			$nMrIDBitLen		= $oCDisID->getMNMrIDBitLen();
 			$nServerIDBitLen	= $oCDisID->getMNServerIDBitLen();
