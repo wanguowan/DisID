@@ -52,6 +52,9 @@ class CDisID {
 	//	baseTime修改标示
 	private $m_bBaseTimeChange;
 
+	//	DisID value
+	private $m_nValue;
+
 	/**
 	 * @return mixed
 	 */
@@ -157,7 +160,7 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nMSTimeBitLen ) && intval( $m_nMSTimeBitLen ) == $m_nMSTimeBitLen )
 		{
-			$this->m_nMSTimeBitLen = $m_nMSTimeBitLen;
+			$this->m_nMSTimeBitLen = intval( $m_nMSTimeBitLen );
 			return $this;
 		}
 		else
@@ -405,7 +408,13 @@ class CDisID {
 					$sMs = $arrTime[ 0 ];
 					$nMic = $sMs * 1000000;
 					$nMicTmp = $nMic % 1000;
-					$this->m_nInMSSN = $nMicTmp % pow( 2, $nMSSNLen );
+					$this->m_nInMSSN = intval( $nMicTmp % pow( 2, $nMSSNLen ) );
+
+					return $this->m_nInMSSN;
+				}
+				else
+				{
+					throw new \Exception( 'create random InMSSN get micTime error' );
 				}
 			}
 			else
@@ -559,5 +568,28 @@ class CDisID {
 		}
 
 		return $bRtn;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getMNValue()
+	{
+		if ( is_int( $this->m_nValue ) )
+		{
+			return $this->m_nValue;
+		}
+		else
+		{
+			throw new \Exception( 'not init value' );
+		}
+	}
+
+	/**
+	 * @param mixed $m_nValue
+	 */
+	public function setMNValue( $m_nValue )
+	{
+		$this->m_nValue = $m_nValue;
 	}
 };

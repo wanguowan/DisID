@@ -12,6 +12,9 @@ class CDisIDOp {
 
 	const CONST_DIS_ID_BIT_LEN = 64;		//	disID 总位数64位
 
+	const CONST_KEY_STRUCTURE_INFO_LENGTH 	= 'len';		//	结构信息中，长度key
+	const CONST_KEY_STRUCTURE_INFO_VALUE	= 'value';		//	结构信息中，值key
+
 	private $m_oCDisID;
 
 	public function __construct( $oCDisID )
@@ -22,14 +25,91 @@ class CDisIDOp {
 		}
 	}
 
-	public function getDisID( $nTime = null )
+	public function getDisID( $nTime = null, $bInMSSNRandom = true )
 	{
 		if ( $this->m_oCDisID instanceof CDisID )
 		{
 			//	设置基础时间
 			$this->m_oCDisID->setMNMSTime( $nTime );
 
+			if ( $bInMSSNRandom )
+			{
+				$this->m_oCDisID->getMNRandInMSSN();
+			}
+
 			return $this->_getDisID();
+		}
+		else
+		{
+			throw new \Exception( 'illegal CDisID instance' );
+		}
+	}
+
+	public function getDisIDValue()
+	{
+		$this->_getDisIDValue();
+	}
+
+	public function getDisIDInstance()
+	{
+		return $this->m_oCDisID;
+	}
+
+	private function _getDisIDValue()
+	{
+		if ( $this->m_oCDisID instanceof CDisID )
+		{
+			$arrStructure = $this->_getDisIDStructure( $this->m_oCDisID, false );
+			if ( is_array( $arrStructure ) && count( $arrStructure ) > 0 )
+			{
+				//	位置偏移量
+				$nBitMoveLen = 0;
+
+				//	实际DisID
+				$nDisID = $this->m_oCDisID->getMNValue();
+
+				$arrStructure = array_reverse( $arrStructure, false );
+				for( $i = 0; $i < count( $arrStructure ); $i ++ )
+				{
+					$arrInfo = $arrStructure[ $i ];
+					if ( is_array( $arrInfo )
+						&& array_key_exists( self::CONST_KEY_STRUCTURE_INFO_LENGTH, $arrInfo )
+						&& array_key_exists( self::CONST_KEY_STRUCTURE_INFO_VALUE, $arrInfo )
+					)
+					{
+						$nLen 		= $arrInfo[ self::CONST_KEY_STRUCTURE_INFO_LENGTH ];
+						$sKeyValue 	= $arrInfo[ self::CONST_KEY_STRUCTURE_INFO_VALUE ];
+						if ( is_int( $nLen ) )
+						{
+							$nOr = 0;
+							for( $j = 0; $j < $nLen; $j ++ )
+							{
+								$nOr |= 1 << $j;
+							}
+							$nDisIDTmp = $nDisID >> $nBitMoveLen . "\n";
+
+							$nValue = $nDisIDTmp & $nOr;
+
+							//	设置属性值
+							call_user_func( [ $this->m_oCDisID, $sKeyValue ], $nValue );
+
+							$nBitMoveLen += $nLen;
+						}
+						else
+						{
+							throw new \Exception( 'get disIDValue structure info error' );
+						}
+					}
+					else
+					{
+						throw new \Exception( 'get disIDValue structure info error' );
+					}
+				}
+			}
+			else
+			{
+				throw new \Exception( 'get DisID structure fail' );
+			}
 		}
 		else
 		{
@@ -43,68 +123,51 @@ class CDisIDOp {
 
 		if ( $oDisID instanceof  CDisID )
 		{
-			//	获得距离baseTime毫秒时间
-			$nMSTime = $oDisID->getMNMSTime();
+			//	获得DisID结构信息
+			$arrStructure = $this->_getDisIDStructure( $oDisID );
 
-			//	获得baseTime毫秒时间bit长度
-			$nMSTimeBitLen = $oDisID->getMNMSTimeBitLen();
+			if ( is_array( $arrStructure ) && count( $arrStructure ) > 0 )
+			{
+				//	位移偏量
+				$nBitMoveLen = 0;
 
-			//	获得业务线编号
-			$nOpID = $oDisID->getMNOpID();
+				//	最终生成的DisID
+				$nDisID = 0;
 
-			//	获得业务编号bit长度
-			$nOpIDBitLen = $oDisID->getMNOpIDBitLen();
+				//	按照结构生成DisID
+				for( $i = 0; $i < count( $arrStructure ); $i ++ )
+				{
+					$arrInfo = $arrStructure[ $i ];
+					if ( is_array( $arrInfo )
+						&& array_key_exists( self::CONST_KEY_STRUCTURE_INFO_VALUE, $arrInfo )
+						&& array_key_exists( self::CONST_KEY_STRUCTURE_INFO_LENGTH, $arrInfo )
+					)
+					{
+						$nLen = $arrInfo[ self::CONST_KEY_STRUCTURE_INFO_LENGTH ];
+						$nValue = $arrInfo[ self::CONST_KEY_STRUCTURE_INFO_VALUE ];
+						if ( is_int( $nValue ) && is_int( $nLen ) )
+						{
+							$nBitMoveLen += $arrInfo[ self::CONST_KEY_STRUCTURE_INFO_LENGTH ];
+							$nBaseValue = $arrInfo[ self::CONST_KEY_STRUCTURE_INFO_VALUE ] << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
+							$nDisID |= $nBaseValue;
+						}
+						else
+						{
+							throw new \Exception( 'get disID structure info error' );
+						}
+					}
+					else
+					{
+						throw new \Exception( 'get disID structure info error' );
+					}
+				}
 
-			//	获得机房编号
-			$nMrID = $oDisID->getMNMrID();
-
-			//	获得机房编号bit长度
-			$nMrIDBitLen = $oDisID->getMNMrIDBitLen();
-
-			//	获得预留值
-			$nLeft = $oDisID->getMNLeft();
-
-			//	获得预留址bit长度
-			$nLeftBitLen = $oDisID->getMNLeftBitLen();
-
-			//	获得毫秒内序列号
-			$nInMSSN = $oDisID->getMNInMSSN();
-
-			//	获得毫秒内序列号bit长度
-			$nInMSSNBitLen = $oDisID->getMNInMSSNBitLen();
-
-			//	位移偏量
-			$nBitMoveLen = 0;
-
-			//	最终生成的DisID
-			$nDidID = 0;
-
-			//	计算baseTime
-			$nBitMoveLen = $nMSTimeBitLen;
-			$nBaseTimeInt = $nMSTime << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
-			$nDidID = $nBaseTimeInt;
-
-			//	计算业务线编号
-			$nBitMoveLen += $nOpIDBitLen;
-			$nOpIDInt = $nOpID << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
-			$nDidID |= $nOpIDInt;
-
-			//	计算机房编号
-			$nBitMoveLen += $nMrIDBitLen;
-			$nMrIDInt = $nMrID << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
-			$nDidID |= $nMrIDInt;
-
-			//	计算预留值
-			$nBitMoveLen += $nLeftBitLen;
-			$nLeftInt = $nLeft << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
-			$nDidID |= $nLeftInt;
-
-			//	计算毫秒内序列号
-			$nBitMoveLen += $nInMSSNBitLen;
-			$nInMSSNInt = $nInMSSN << ( self::CONST_DIS_ID_BIT_LEN - $nBitMoveLen );
-			$nDidID |= $nInMSSNInt;
-
-			return $nDidID;
+				return $nDisID;
+			}
+			else
+			{
+				throw new \Exception( 'get DisID structure fail' );
+			}
 		}
 		else
 		{
@@ -143,5 +206,62 @@ class CDisIDOp {
 		}
 
 		return $bRtn;
+	}
+
+	private function _getDisIDStructure( $oCDisID, $bNeedValue = true )
+	{
+		$arrStructure = [];
+
+		if ( $oCDisID instanceof CDisID )
+		{
+			//	毫秒数
+			$arrMSTime = [
+				self::CONST_KEY_STRUCTURE_INFO_LENGTH	=> $oCDisID->getMNMSTimeBitLen(),
+				self::CONST_KEY_STRUCTURE_INFO_VALUE	=> $bNeedValue ? $oCDisID->getMNMSTime() : 'setMNMSTime'
+			];
+
+			//	业务线
+			$arrOpID = [
+				self::CONST_KEY_STRUCTURE_INFO_LENGTH	=> $oCDisID->getMNOpIDBitLen(),
+				self::CONST_KEY_STRUCTURE_INFO_VALUE	=> $bNeedValue ? $oCDisID->getMNOpID() : 'setMNOpID'
+			];
+
+			//	机房
+			$arrMrID = [
+				self::CONST_KEY_STRUCTURE_INFO_LENGTH	=> $oCDisID->getMNMrIDBitLen(),
+				self::CONST_KEY_STRUCTURE_INFO_VALUE	=> $bNeedValue ? $oCDisID->getMNMrID() : 'setMNMrID'
+			];
+
+			//	机器
+			$arrServerID = [
+				self::CONST_KEY_STRUCTURE_INFO_LENGTH	=> $oCDisID->getMNServerIDBitLen(),
+				self::CONST_KEY_STRUCTURE_INFO_VALUE	=> $bNeedValue ? $oCDisID->getMNServerID() : 'setMNServerID'
+			];
+
+			//	预留
+			$arrLeft = [
+				self::CONST_KEY_STRUCTURE_INFO_LENGTH	=> $oCDisID->getMNLeftBitLen(),
+				self::CONST_KEY_STRUCTURE_INFO_VALUE	=> $bNeedValue ? $oCDisID->getMNLeft() : 'setMNLeft'
+			];
+
+			//	毫秒內序列号
+			$arrInMSSN = [
+				self::CONST_KEY_STRUCTURE_INFO_LENGTH	=> $oCDisID->getMNInMSSNBitLen(),
+				self::CONST_KEY_STRUCTURE_INFO_VALUE	=> $bNeedValue ? $oCDisID->getMNInMSSN() : 'setMNInMSSN'
+			];
+
+			$arrStructure[] = $arrMSTime;
+			$arrStructure[] = $arrOpID;
+			$arrStructure[] = $arrMrID;
+			$arrStructure[] = $arrServerID;
+			$arrStructure[] = $arrLeft;
+			$arrStructure[] = $arrInMSSN;
+		}
+		else
+		{
+			throw new \Exception( 'illegal CDisID instance' );
+		}
+
+		return $arrStructure;
 	}
 }
