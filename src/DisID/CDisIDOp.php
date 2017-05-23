@@ -45,9 +45,11 @@ class CDisIDOp {
 		}
 	}
 
-	public function getDisIDValue()
+	public function getDisIDValue( $nValue )
 	{
-		$this->_getDisIDValue();
+		$this->_getDisIDValue( $nValue );
+
+		return $this->m_oCDisID;
 	}
 
 	public function getDisIDInstance()
@@ -55,10 +57,12 @@ class CDisIDOp {
 		return $this->m_oCDisID;
 	}
 
-	private function _getDisIDValue()
+	private function _getDisIDValue( $nValue )
 	{
 		if ( $this->m_oCDisID instanceof CDisID )
 		{
+			$this->m_oCDisID->setMNValue( $nValue );
+
 			$arrStructure = $this->_getDisIDStructure( $this->m_oCDisID, false );
 			if ( is_array( $arrStructure ) && count( $arrStructure ) > 0 )
 			{

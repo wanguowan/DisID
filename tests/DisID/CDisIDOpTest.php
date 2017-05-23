@@ -85,20 +85,7 @@ Class CDisIDOpTest extends TestBase
 
 		$nDisID = $oDisIDOp->getDisID();
 
-		$oDisIDNew = new CDisID();
-
-		$oDisIDNew->setMNMSTimeBitLen( 39 )
-			->setMNOpIDBitLen( 4 )
-			->setMNMrIDBitLen( 2 )
-			->setMNServerIDBitLen( 7 )
-			->setMNLeftBitLen( 5 )
-			->setMNInMSSNBitLen( 7 );
-		$oDisIDNew->setMNValue( $nDisID );
-
-		$oDisIDOpNew = new CDisIDOp( $oDisIDNew );
-		$oDisIDOpNew->getDisIDValue();
-
-		$oDisIDFinal = $oDisIDOpNew->getDisIDInstance();
+		$oDisIDFinal = $oDisIDOp->getDisIDValue( $nDisID );
 
 		$this->assertEquals( $oDisIDFinal->getMNMSTime(), $oDisID->getMNMSTime() );
 		$this->assertEquals( $oDisIDFinal->getMNOpID(), 1 );
