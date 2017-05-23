@@ -125,6 +125,7 @@ class CDisID {
 			throw new \Exception( 'MSTime params error' );
 		}
 
+		$m_nMSTime = intval( $m_nMSTime );
 		if ( $this->_checkValueOutOfLimit( $m_nMSTime, $this->getMNMSTimeBitLen() ) )
 		{
 			$this->m_nMSTime = intval( $m_nMSTime );
@@ -191,9 +192,10 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nOpID ) && intval( $m_nOpID ) == $m_nOpID )
 		{
+			$m_nOpID = intval( $m_nOpID );
 			if ( $this->_checkValueOutOfLimit( $m_nOpID, $this->getMNOpIDBitLen() ) )
 			{
-				$this->m_nOpID = intval( $m_nOpID );
+				$this->m_nOpID = $m_nOpID;
 				return $this;
 			}
 			else
@@ -260,6 +262,7 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nMrID ) && intval( $m_nMrID ) == $m_nMrID )
 		{
+			$m_nMrID = intval( $m_nMrID );
 			if ( $this->_checkValueOutOfLimit( $m_nMrID, $this->getMNMrIDBitLen() ) )
 			{
 				$this->m_nMrID = intval( $m_nMrID );
@@ -329,6 +332,7 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nServerID ) && intval( $m_nServerID ) == $m_nServerID )
 		{
+			$m_nServerID = intval( $m_nServerID );
 			if ( $this->_checkValueOutOfLimit( $m_nServerID, $this->getMNServerIDBitLen() ) )
 			{
 				$this->m_nServerID = intval( $m_nServerID );
@@ -431,6 +435,7 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nInMSSN ) && intval( $m_nInMSSN ) == $m_nInMSSN )
 		{
+			$m_nInMSSN = intval( $m_nInMSSN );
 			if ( $this->_checkValueOutOfLimit( $m_nInMSSN, $this->getMNInMSSNBitLen() ) )
 			{
 				$this->m_nInMSSN = intval( $m_nInMSSN );
@@ -500,6 +505,7 @@ class CDisID {
 	{
 		if ( is_numeric( $m_nLeft ) && intval( $m_nLeft ) == $m_nLeft )
 		{
+			$m_nLeft = intval( $m_nLeft );
 			if ( $this->_checkValueOutOfLimit( $m_nLeft, $this->getMNLeftBitLen() ) )
 			{
 				$this->m_nLeft = intval( $m_nLeft );
@@ -590,6 +596,13 @@ class CDisID {
 	 */
 	public function setMNValue( $m_nValue )
 	{
-		$this->m_nValue = $m_nValue;
+		if ( is_numeric( $m_nValue ) && intval( $m_nValue ) == $m_nValue )
+		{
+			$this->m_nValue = intval( $m_nValue );
+		}
+		else
+		{
+			throw new \Exception( 'illegal disid value' );
+		}
 	}
 };
