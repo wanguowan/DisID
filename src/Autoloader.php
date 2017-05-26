@@ -5,7 +5,7 @@
  * Date: 5/20/17
  * Time: 2:14 PM
  */
-namespace wan;
+namespace Wan;
 
 Class Autoloader
 {

@@ -8,4 +8,4 @@
 
 require __DIR__ . '/src/Autoloader.php';
 
-wan\Autoloader::register();
+Wan\Autoloader::register();

@@ -6,7 +6,9 @@
  * Time: 6:07 PM
  */
 
-namespace wan\DisID;
+namespace Wan\DisID;
+
+use Wan\Lib\CBasicLib;
 
 class CDisIDOp {
 
@@ -64,7 +66,7 @@ class CDisIDOp {
 			$this->m_oCDisID->setMNValue( $nValue );
 
 			$arrStructure = $this->_getDisIDStructure( $this->m_oCDisID, false );
-			if ( is_array( $arrStructure ) && count( $arrStructure ) > 0 )
+			if ( CBasicLib::isValidArray( $arrStructure ) )
 			{
 				//	位置偏移量
 				$nBitMoveLen = 0;
@@ -130,7 +132,7 @@ class CDisIDOp {
 			//	获得DisID结构信息
 			$arrStructure = $this->_getDisIDStructure( $oDisID );
 
-			if ( is_array( $arrStructure ) && count( $arrStructure ) > 0 )
+			if ( CBasicLib::isValidArray( $arrStructure ) )
 			{
 				//	位移偏量
 				$nBitMoveLen = 0;

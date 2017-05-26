@@ -5,7 +5,7 @@
  * Date: 5/22/17
  * Time: 3:14 PM
  */
-namespace wan\DisID;
+namespace Wan\DisID;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Foundation\Application as LaravelApp;
