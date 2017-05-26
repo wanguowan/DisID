@@ -18,6 +18,6 @@
 		"phpunit/phpunit": "~4.8"
 	},
 	"autoload": {
-		"psr-4": {"wan\\DisID\\": "src/DisID"}
+		"psr-4": {"Wan\\DisID\\": "src/DisID"}
 	}
 }
