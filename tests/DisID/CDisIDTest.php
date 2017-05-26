@@ -5,7 +5,7 @@
  * Date: 5/20/17
  * Time: 2:36 PM
  */
-use wan\DisID\CDisID;
+use Wan\DisID\CDisID;
 
 Class CDisIDTest extends TestBase
 {

@@ -5,8 +5,10 @@
  * Date: 5/18/17
  * Time: 4:58 PM
  */
-namespace wan\DisID;
+namespace Wan\DisID;
 
+
+use Wan\Lib\CBasicLib;
 
 class CDisID {
 
@@ -73,10 +75,7 @@ class CDisID {
 	 */
 	public function setMNMSBaseTime( $m_sMSBaseTime )
 	{
-		if ( is_string( $m_sMSBaseTime )
-			&& strlen( $m_sMSBaseTime ) > 0
-			&& 0 === strcasecmp( date( 'Y-m-d', strtotime( $m_sMSBaseTime ) ), $m_sMSBaseTime )
-		)
+		if ( CBasicLib::isValidDateTime( $m_sMSBaseTime, 'Y-m-d') )
 		{
 			$this->m_bBaseTimeChange = true;
 			$this->m_nMSBaseTime = intval( strtotime( $m_sMSBaseTime ) * 1000 );
@@ -120,7 +119,7 @@ class CDisID {
 			$fTimestampNow = microtime( true );
 			$m_nMSTime = intval( $fTimestampNow * 1000 - $this->getMNMSBaseTime() );
 		}
-		else if ( ! is_numeric( $m_nMSTime ) || intval( $m_nMSTime ) != $m_nMSTime )
+		else if ( ! CBasicLib::isValidInt( $m_nMSTime ) )
 		{
 			throw new \Exception( 'MSTime params error' );
 		}
@@ -159,7 +158,7 @@ class CDisID {
 	 */
 	public function setMNMSTimeBitLen( $m_nMSTimeBitLen )
 	{
-		if ( is_numeric( $m_nMSTimeBitLen ) && intval( $m_nMSTimeBitLen ) == $m_nMSTimeBitLen )
+		if ( CBasicLib::isValidInt( $m_nMSTimeBitLen ) )
 		{
 			$this->m_nMSTimeBitLen = intval( $m_nMSTimeBitLen );
 			return $this;
@@ -190,7 +189,7 @@ class CDisID {
 	 */
 	public function setMNOpID( $m_nOpID )
 	{
-		if ( is_numeric( $m_nOpID ) && intval( $m_nOpID ) == $m_nOpID )
+		if ( CBasicLib::isValidInt( $m_nOpID ) )
 		{
 			$m_nOpID = intval( $m_nOpID );
 			if ( $this->_checkValueOutOfLimit( $m_nOpID, $this->getMNOpIDBitLen() ) )
@@ -229,7 +228,7 @@ class CDisID {
 	 */
 	public function setMNOpIDBitLen( $m_nOpIDBitLen )
 	{
-		if ( is_numeric( $m_nOpIDBitLen ) && intval( $m_nOpIDBitLen ) == $m_nOpIDBitLen )
+		if ( CBasicLib::isValidInt( $m_nOpIDBitLen ) )
 		{
 			$this->m_nOpIDBitLen = intval( $m_nOpIDBitLen );
 			return $this;
@@ -260,7 +259,7 @@ class CDisID {
 	 */
 	public function setMNMrID( $m_nMrID )
 	{
-		if ( is_numeric( $m_nMrID ) && intval( $m_nMrID ) == $m_nMrID )
+		if ( CBasicLib::isValidInt( $m_nMrID ) )
 		{
 			$m_nMrID = intval( $m_nMrID );
 			if ( $this->_checkValueOutOfLimit( $m_nMrID, $this->getMNMrIDBitLen() ) )
@@ -299,7 +298,7 @@ class CDisID {
 	 */
 	public function setMNMrIDBitLen( $m_nMrIDBitLen )
 	{
-		if ( is_numeric( $m_nMrIDBitLen ) && intval( $m_nMrIDBitLen ) == $m_nMrIDBitLen )
+		if ( CBasicLib::isValidInt( $m_nMrIDBitLen ) )
 		{
 			$this->m_nMrIDBitLen = intval( $m_nMrIDBitLen );
 			return $this;
@@ -330,7 +329,7 @@ class CDisID {
 	 */
 	public function setMNServerID( $m_nServerID )
 	{
-		if ( is_numeric( $m_nServerID ) && intval( $m_nServerID ) == $m_nServerID )
+		if ( CBasicLib::isValidInt( $m_nServerID ) )
 		{
 			$m_nServerID = intval( $m_nServerID );
 			if ( $this->_checkValueOutOfLimit( $m_nServerID, $this->getMNServerIDBitLen() ) )
@@ -369,7 +368,7 @@ class CDisID {
 	 */
 	public function setMNServerIDBitLen( $m_nServerIDBitLen )
 	{
-		if ( is_numeric( $m_nServerIDBitLen ) && intval( $m_nServerIDBitLen ) == $m_nServerIDBitLen )
+		if ( CBasicLib::isValidInt( $m_nServerIDBitLen ) )
 		{
 			$this->m_nServerIDBitLen = intval( $m_nServerIDBitLen );
 			return $this;
@@ -407,7 +406,7 @@ class CDisID {
 			if ( $nMSSNLen <= 10 )
 			{
 				$arrTime = explode( ' ', microtime( false ) );
-				if ( is_array( $arrTime ) && count( $arrTime ) == 2 )
+				if ( CBasicLib::isValidArray( $arrTime ) )
 				{
 					$sMs = $arrTime[ 0 ];
 					$nMic = $sMs * 1000000;
@@ -433,7 +432,7 @@ class CDisID {
 	 */
 	public function setMNInMSSN( $m_nInMSSN )
 	{
-		if ( is_numeric( $m_nInMSSN ) && intval( $m_nInMSSN ) == $m_nInMSSN )
+		if ( CBasicLib::isValidInt( $m_nInMSSN ) )
 		{
 			$m_nInMSSN = intval( $m_nInMSSN );
 			if ( $this->_checkValueOutOfLimit( $m_nInMSSN, $this->getMNInMSSNBitLen() ) )
@@ -472,7 +471,7 @@ class CDisID {
 	 */
 	public function setMNInMSSNBitLen( $m_nInMSSNBitLen )
 	{
-		if ( is_numeric( $m_nInMSSNBitLen ) && intval( $m_nInMSSNBitLen ) == $m_nInMSSNBitLen )
+		if ( CBasicLib::isValidInt( $m_nInMSSNBitLen ) )
 		{
 			$this->m_nInMSSNBitLen = intval( $m_nInMSSNBitLen );
 			return $this;
@@ -503,7 +502,7 @@ class CDisID {
 	 */
 	public function setMNLeft( $m_nLeft )
 	{
-		if ( is_numeric( $m_nLeft ) && intval( $m_nLeft ) == $m_nLeft )
+		if ( CBasicLib::isValidInt( $m_nLeft ) )
 		{
 			$m_nLeft = intval( $m_nLeft );
 			if ( $this->_checkValueOutOfLimit( $m_nLeft, $this->getMNLeftBitLen() ) )
@@ -542,7 +541,7 @@ class CDisID {
 	 */
 	public function setMNLeftBitLen( $m_nLeftBitLen )
 	{
-		if ( is_numeric( $m_nLeftBitLen ) && intval( $m_nLeftBitLen ) == $m_nLeftBitLen )
+		if ( CBasicLib::isValidInt( $m_nLeftBitLen ) )
 		{
 			$this->m_nLeftBitLen = intval( $m_nLeftBitLen );
 			return $this;
@@ -596,7 +595,7 @@ class CDisID {
 	 */
 	public function setMNValue( $m_nValue )
 	{
-		if ( is_numeric( $m_nValue ) && intval( $m_nValue ) == $m_nValue )
+		if ( CBasicLib::isValidInt( $m_nValue ) )
 		{
 			$this->m_nValue = intval( $m_nValue );
 		}
